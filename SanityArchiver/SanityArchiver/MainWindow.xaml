@@ -1,0 +1,44 @@
+﻿<Window x:Class="SanityArchiver.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SanityArchiver"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="525">
+    <Grid>
+
+        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="72">
+                        Hello, WPF!
+        </TextBlock>
+
+
+        <Button>
+            <Button.FontWeight>Bold</Button.FontWeight>
+            <Button.Content>
+                <WrapPanel>
+                    <TextBlock Foreground="Blue" RenderTransformOrigin="0.193,0.31" Height="37" Width="73">
+                        <TextBlock.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform/>
+                                <RotateTransform Angle="14.013"/>
+                                <TranslateTransform X="2.369" Y="-5.217"/>
+                            </TransformGroup>
+                        </TextBlock.RenderTransform><Run Text="Multi"/></TextBlock>
+                    <TextBlock Foreground="Red"><Run Text="Color"/></TextBlock>
+                    <TextBlock RenderTransformOrigin="0.373,0.345" Width="71">
+                        <TextBlock.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform/>
+                                <RotateTransform Angle="27.124"/>
+                                <TranslateTransform X="3.606" Y="-3.479"/>
+                            </TransformGroup>
+                        </TextBlock.RenderTransform><Run Text="Button"/></TextBlock>
+                </WrapPanel>
+            </Button.Content>
+        </Button>
+
+    </Grid>
+</Window>
