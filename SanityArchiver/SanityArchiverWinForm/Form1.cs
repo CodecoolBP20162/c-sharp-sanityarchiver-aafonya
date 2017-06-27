@@ -14,7 +14,7 @@ namespace SanityArchiverWinForm
     public partial class Form1 : Form
     {
         static List<FileInfo> FoundFiles;
-        static string directoryName = @"C:\Users\Judit";
+        static string directoryPath = @"C:\Users\Judit";
         static string fileName;
         DirectoryInfo directory;
         DirectoryInfo[] directories;
@@ -24,6 +24,11 @@ namespace SanityArchiverWinForm
         public Form1()
         {
             InitializeComponent();
+            tableLayoutPanel1.Visible = false;
+            tableLayoutPanel2.Visible = false;
+            DirectoriesLabel.Visible = false;
+            FilesLabel.Visible = false;
+            pictureBox1.Visible = false;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -38,7 +43,7 @@ namespace SanityArchiverWinForm
 
         private void FileBrowser_Click(object sender, EventArgs e)
         {
-            directory = new DirectoryInfo(directoryName);
+            directory = new DirectoryInfo(directoryPath);
             directories = directory.GetDirectories();
             files = directory.GetFiles();
 
@@ -49,7 +54,13 @@ namespace SanityArchiverWinForm
             tableLayoutPanel2.AutoScroll = (files.Length > 16) ? true : false;
             CreateMapButtons(directories.Length, directories, files.Length, files);
 
-            ActualDirectoriesName.Text = directoryName;
+            ActualDirectoriesName.Text = directoryPath;
+
+            tableLayoutPanel1.Visible = true;
+            tableLayoutPanel2.Visible = true;
+            DirectoriesLabel.Visible = true;
+            FilesLabel.Visible = true;
+            pictureBox1.Visible = true;
         }
 
         public void CreateMapButtons(int DirectoryNumber, DirectoryInfo[] directories, int FileNumber, FileInfo[] files)
@@ -106,12 +117,28 @@ namespace SanityArchiverWinForm
 
         void dir_Click(object sender, EventArgs e)
         {
+            tableLayoutPanel1.Controls.Clear();
+            tableLayoutPanel2.Controls.Clear();
+
             var b = sender as Button;
             if (b != null)
                 MessageBox.Show(string.Format("{0} Clicked", b.Text));
 
-            directoryName = (sender as Button).Text;
-            directory = new DirectoryInfo(directoryName);
+            string directoryName = (sender as Button).Text;
+
+            //string[] arr = { "One", "Two", "Three" };
+            //var target = "One";
+            //var results = Array.FindAll(arr, s => s.Equals(target));
+
+            //directoryPath = Array.Find(directories, s => s.Name.Equals(directoryName));
+            foreach(DirectoryInfo dir in directories)
+            {
+                if (dir.Name.Equals(directoryName))
+                {
+                    directory = dir;
+                }
+            }
+            //directory = new DirectoryInfo(directoryPath);
             directories = directory.GetDirectories();
             files = directory.GetFiles();
 
@@ -122,8 +149,10 @@ namespace SanityArchiverWinForm
             tableLayoutPanel2.AutoScroll = (files.Length > 16) ? true : false;
             CreateMapButtons(directories.Length, directories, files.Length, files);
 
-            ActualDirectoriesName.Text = directoryName;
+            ActualDirectoriesName.Text = directory.FullName;
         }
+
+
 
         void fil_Click(object sender, EventArgs e)
         {
@@ -152,8 +181,16 @@ namespace SanityArchiverWinForm
 
         private void ActualDirectoriesName_TextChanged(object sender, EventArgs e)
         {
-            directoryName = (sender as TextBox).Text;
-            directory = new DirectoryInfo(directoryName);
+            
+        }
+
+        private void UpdateButton_Click(object sender, EventArgs e)
+        {
+            tableLayoutPanel1.Controls.Clear();
+            tableLayoutPanel2.Controls.Clear();
+
+            directoryPath = ActualDirectoriesName.Text;
+            directory = new DirectoryInfo(directoryPath);
             directories = directory.GetDirectories();
             files = directory.GetFiles();
 
@@ -163,6 +200,11 @@ namespace SanityArchiverWinForm
             tableLayoutPanel2.AutoSize = (files.Length > 16) ? false : true;
             tableLayoutPanel2.AutoScroll = (files.Length > 16) ? true : false;
             CreateMapButtons(directories.Length, directories, files.Length, files);
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
