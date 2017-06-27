@@ -14,6 +14,7 @@ namespace SanityArchiverWinForm
     public partial class Form1 : Form
     {
         static List<FileInfo> FoundFiles;
+        static string defaultDirectoryPath = @"C:\Users\Judit";
         static string directoryPath = @"C:\Users\Judit";
         static string fileName;
         DirectoryInfo directory;
@@ -24,6 +25,11 @@ namespace SanityArchiverWinForm
         public Form1()
         {
             InitializeComponent();
+
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
             tableLayoutPanel1.Visible = false;
             tableLayoutPanel2.Visible = false;
             DirectoriesLabel.Visible = false;
@@ -31,30 +37,11 @@ namespace SanityArchiverWinForm
             pictureBox1.Visible = false;
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            // Show the dialog and get result.
-            DialogResult result = openFileDialog1.ShowDialog();
-            if (result == DialogResult.OK) // Test result.
-            {
-            }
-            Console.WriteLine(result); // <-- For debugging use.
-        }
-
         private void FileBrowser_Click(object sender, EventArgs e)
         {
             directory = new DirectoryInfo(directoryPath);
-            directories = directory.GetDirectories();
-            files = directory.GetFiles();
 
-            tableLayoutPanel1.AutoSize = (directories.Length > 16) ? false : true;
-            tableLayoutPanel1.AutoScroll = (directories.Length > 16) ? true: false;
-
-            tableLayoutPanel2.AutoSize = (files.Length > 16) ? false : true;
-            tableLayoutPanel2.AutoScroll = (files.Length > 16) ? true : false;
-            CreateMapButtons(directories.Length, directories, files.Length, files);
-
-            ActualDirectoriesName.Text = directoryPath;
+            UpdateDirectoryInfos();
 
             tableLayoutPanel1.Visible = true;
             tableLayoutPanel2.Visible = true;
@@ -67,11 +54,20 @@ namespace SanityArchiverWinForm
         {
             int rowCount;
             int rowCountForFiles;
-            int columnCount = 4;
-            
+            int columnCount = 3;
 
-            rowCount = (DirectoryNumber % columnCount == 0) ? DirectoryNumber % columnCount : (DirectoryNumber % columnCount) + 1;
-            rowCountForFiles = (FileNumber % columnCount == 0) ? FileNumber % columnCount : (FileNumber % columnCount) + 1;
+
+            rowCount = (DirectoryNumber % columnCount == 0) ? DirectoryNumber / columnCount : (DirectoryNumber / columnCount) + 1;
+            rowCountForFiles = (FileNumber % columnCount == 0) ? FileNumber / columnCount : (FileNumber / columnCount) + 1;
+
+            if (rowCount == 0)
+            {
+                rowCount++;
+            }
+            else if (rowCountForFiles == 0)
+            {
+                rowCountForFiles++;
+            }
 
             this.tableLayoutPanel1.ColumnCount = columnCount;
             this.tableLayoutPanel1.RowCount = rowCount;
@@ -117,39 +113,21 @@ namespace SanityArchiverWinForm
 
         void dir_Click(object sender, EventArgs e)
         {
-            tableLayoutPanel1.Controls.Clear();
-            tableLayoutPanel2.Controls.Clear();
-
             var b = sender as Button;
             if (b != null)
                 MessageBox.Show(string.Format("{0} Clicked", b.Text));
-
+            
             string directoryName = (sender as Button).Text;
 
-            //string[] arr = { "One", "Two", "Three" };
-            //var target = "One";
-            //var results = Array.FindAll(arr, s => s.Equals(target));
-
             //directoryPath = Array.Find(directories, s => s.Name.Equals(directoryName));
-            foreach(DirectoryInfo dir in directories)
+            foreach (DirectoryInfo dir in directories)
             {
                 if (dir.Name.Equals(directoryName))
                 {
                     directory = dir;
                 }
             }
-            //directory = new DirectoryInfo(directoryPath);
-            directories = directory.GetDirectories();
-            files = directory.GetFiles();
-
-            tableLayoutPanel1.AutoSize = (directories.Length > 16) ? false : true;
-            tableLayoutPanel1.AutoScroll = (directories.Length > 16) ? true : false;
-
-            tableLayoutPanel2.AutoSize = (files.Length > 16) ? false : true;
-            tableLayoutPanel2.AutoScroll = (files.Length > 16) ? true : false;
-            CreateMapButtons(directories.Length, directories, files.Length, files);
-
-            ActualDirectoriesName.Text = directory.FullName;
+            UpdateDirectoryInfos();
         }
 
 
@@ -174,37 +152,64 @@ namespace SanityArchiverWinForm
             }
         }
 
-        private void flowLayoutPanel1_Scroll(object sender, ScrollEventArgs e)
-        {
-
-        }
-
         private void ActualDirectoriesName_TextChanged(object sender, EventArgs e)
         {
-            
+
         }
 
         private void UpdateButton_Click(object sender, EventArgs e)
         {
-            tableLayoutPanel1.Controls.Clear();
-            tableLayoutPanel2.Controls.Clear();
+            if (tableLayoutPanel1.Controls.Count > 0 || tableLayoutPanel2.Controls.Count > 0)
+            {
+                directoryPath = ActualDirectoriesName.Text;
+                directory = new DirectoryInfo(directoryPath);
 
-            directoryPath = ActualDirectoriesName.Text;
-            directory = new DirectoryInfo(directoryPath);
-            directories = directory.GetDirectories();
-            files = directory.GetFiles();
+                UpdateDirectoryInfos();
+            }
 
-            tableLayoutPanel1.AutoSize = (directories.Length > 16) ? false : true;
-            tableLayoutPanel1.AutoScroll = (directories.Length > 16) ? true : false;
-
-            tableLayoutPanel2.AutoSize = (files.Length > 16) ? false : true;
-            tableLayoutPanel2.AutoScroll = (files.Length > 16) ? true : false;
-            CreateMapButtons(directories.Length, directories, files.Length, files);
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void BackButton_Click(object sender, EventArgs e)
+        {
+            if (tableLayoutPanel1.Controls.Count > 0 || tableLayoutPanel2.Controls.Count > 0)
+            {
+                directory = directory.Parent;
+                UpdateDirectoryInfos();
+            }
+        }
+
+        public void UpdateDirectoryInfos()
+        {
+            tableLayoutPanel1.Controls.Clear();
+            tableLayoutPanel2.Controls.Clear();
+
+            try
+            {
+                directories = directory.GetDirectories();
+            }
+            catch
+            {
+                MessageBox.Show(string.Format("Can't access this folder"));
+
+                directory = new DirectoryInfo(defaultDirectoryPath);
+            }
+
+            files = directory.GetFiles();
+
+            tableLayoutPanel1.AutoSize = (directories.Length > 9) ? false : true;
+            tableLayoutPanel1.AutoScroll = (directories.Length > 9) ? true : false;
+
+            tableLayoutPanel2.AutoSize = (files.Length > 9) ? false : true;
+            tableLayoutPanel2.AutoScroll = (files.Length > 9) ? true : false;
+            CreateMapButtons(directories.Length, directories, files.Length, files);
+
+            directoryPath = directory.FullName;
+            ActualDirectoriesName.Text = directoryPath;
         }
     }
 }
