@@ -1,26 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SanityArchiverWinForm
 {
     public partial class Form1 : Form
     {
-        static List<FileInfo> FoundFiles;
         static string defaultDirectoryPath = @"C:\Users\Judit";
         static string directoryPath = @"C:\Users\Judit";
-        static string fileName;
         DirectoryInfo directory;
         DirectoryInfo[] directories;
         FileInfo[] files;
 
+        
 
         public Form1()
         {
@@ -37,7 +31,7 @@ namespace SanityArchiverWinForm
             pictureBox1.Visible = false;
         }
 
-        private void FileBrowser_Click(object sender, EventArgs e)
+        private void FileBrowserButton_Click(object sender, EventArgs e)
         {
             directory = new DirectoryInfo(directoryPath);
 
@@ -47,15 +41,15 @@ namespace SanityArchiverWinForm
             tableLayoutPanel2.Visible = true;
             DirectoriesLabel.Visible = true;
             FilesLabel.Visible = true;
-            pictureBox1.Visible = true;
+
+            pictureBox1.Visible = (directories.Length > 0 && files.Length > 0) ? true : false;
         }
 
-        public void CreateMapButtons(int DirectoryNumber, DirectoryInfo[] directories, int FileNumber, FileInfo[] files)
+        public void CreateTable(int DirectoryNumber, DirectoryInfo[] directories, int FileNumber, FileInfo[] files)
         {
             int rowCount;
             int rowCountForFiles;
             int columnCount = 3;
-
 
             rowCount = (DirectoryNumber % columnCount == 0) ? DirectoryNumber / columnCount : (DirectoryNumber / columnCount) + 1;
             rowCountForFiles = (FileNumber % columnCount == 0) ? FileNumber / columnCount : (FileNumber / columnCount) + 1;
@@ -89,26 +83,66 @@ namespace SanityArchiverWinForm
                 this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100 / rowCount));
             }
 
+            CreateDirectoryButtons();
+
+            CreateFileButtons();
+
+        }
+
+        public void CreateDirectoryButtons()
+        {
             foreach (DirectoryInfo directory in directories)
             {
                 var dir = new Button();
                 dir.Text = (directory.Name).ToString();
                 dir.Name = string.Format("dir_{0}", (directory.Name).ToString());
                 dir.Click += dir_Click;
+                dir.DoubleClick += dir_DoubleClick;
+                dir.ContextMenuStrip = new ContextMenuStrip();
+
                 dir.Dock = DockStyle.Fill;
                 this.tableLayoutPanel1.Controls.Add(dir);
             }
+        }
 
+        public void CreateFileButtons()
+        {
             foreach (FileInfo file in files)
             {
                 var fil = new Button();
                 fil.Text = (file.Name).ToString();
                 fil.Name = string.Format("fil_{0}", (file.Name).ToString());
+
+                CreateContextMenuStripForButton(fil, file);
+
                 fil.Click += fil_Click;
+                fil.DoubleClick += fil_DoubleClick;
                 fil.Dock = DockStyle.Fill;
                 this.tableLayoutPanel2.Controls.Add(fil);
             }
+        }
 
+        public void CreateContextMenuStripForButton(Button button, FileInfo fileinfo)
+        {
+            button.ContextMenuStrip = new ContextMenuStrip();
+
+            ToolStripMenuItem renameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuItem attributesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuItem encryptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuItem compressToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuItem moveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+
+            button.ContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[]
+                    {
+                                                        renameToolStripMenuItem,
+                                                        attributesToolStripMenuItem,
+                                                        encryptToolStripMenuItem,
+                                                        compressToolStripMenuItem,
+                                                        moveToolStripMenuItem
+                    });
+            button.ContextMenuStrip.Name = string.Format("contextMenuStrip_{0}", (fileinfo.Name).ToString());
+            button.ContextMenuStrip.Size = new System.Drawing.Size(153, 136);
+            
         }
 
         void dir_Click(object sender, EventArgs e)
@@ -128,6 +162,15 @@ namespace SanityArchiverWinForm
                 }
             }
             UpdateDirectoryInfos();
+
+            CheckZeroDirectoriesAndFiles();
+
+            pictureBox1.Visible = (directories.Length > 0 && files.Length > 0) ? true : false;
+        }
+
+        void dir_DoubleClick(object sender, EventArgs e)
+        {
+
         }
 
 
@@ -137,6 +180,13 @@ namespace SanityArchiverWinForm
             var b = sender as Button;
             if (b != null)
                 MessageBox.Show(string.Format("{0} Clicked", b.Text));
+
+            b.ContextMenuStrip.Visible = true;
+        }
+
+        void fil_DoubleClick(object sender, EventArgs e)
+        {
+            var b = sender as Button;
         }
 
         static void RecursiveSearch(List<FileInfo> foundFiles, string fileName, DirectoryInfo currentDirectory)
@@ -152,39 +202,36 @@ namespace SanityArchiverWinForm
             }
         }
 
-        private void ActualDirectoriesName_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private void UpdateButton_Click(object sender, EventArgs e)
         {
-            if (tableLayoutPanel1.Controls.Count > 0 || tableLayoutPanel2.Controls.Count > 0)
+            if (ActualDirectoriesName.Text.Length > 0)
             {
                 directoryPath = ActualDirectoriesName.Text;
                 directory = new DirectoryInfo(directoryPath);
 
                 UpdateDirectoryInfos();
             }
+            CheckZeroDirectoriesAndFiles();
 
-        }
-
-        private void pictureBox1_Click(object sender, EventArgs e)
-        {
-
+            pictureBox1.Visible = (directories.Length > 0 && files.Length > 0) ? true : false;
         }
 
         private void BackButton_Click(object sender, EventArgs e)
         {
-            if (tableLayoutPanel1.Controls.Count > 0 || tableLayoutPanel2.Controls.Count > 0)
+            if ( ActualDirectoriesName.Text.Length > 0)
             {
                 directory = directory.Parent;
                 UpdateDirectoryInfos();
             }
+
+            pictureBox1.Visible = (directories.Length > 0 && files.Length > 0) ? true : false;
         }
 
         public void UpdateDirectoryInfos()
         {
+            tableLayoutPanel1.BackgroundImage = null;
+            tableLayoutPanel2.BackgroundImage = null;
+
             tableLayoutPanel1.Controls.Clear();
             tableLayoutPanel2.Controls.Clear();
 
@@ -206,10 +253,29 @@ namespace SanityArchiverWinForm
 
             tableLayoutPanel2.AutoSize = (files.Length > 9) ? false : true;
             tableLayoutPanel2.AutoScroll = (files.Length > 9) ? true : false;
-            CreateMapButtons(directories.Length, directories, files.Length, files);
+            CreateTable(directories.Length, directories, files.Length, files);
 
             directoryPath = directory.FullName;
             ActualDirectoriesName.Text = directoryPath;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        public void CheckZeroDirectoriesAndFiles()
+        {
+            if (tableLayoutPanel1.Controls.Count == 0 && tableLayoutPanel2.Controls.Count == 0)
+            {
+                Image myimage = new Bitmap(@"C:\Users\Judit\Pictures\cat_PNG104.png");
+                Image myimage2 = new Bitmap(@"C:\Users\Judit\Pictures\surprised_cat-300x199.png"); 
+                tableLayoutPanel1.BackgroundImage = myimage;
+                tableLayoutPanel1.BackgroundImageLayout = ImageLayout.Stretch;
+                tableLayoutPanel2.BackgroundImage = myimage2;
+                tableLayoutPanel2.BackgroundImageLayout = ImageLayout.Stretch;
+                MessageBox.Show("There are no directories and files here.");
+            }
         }
     }
 }
