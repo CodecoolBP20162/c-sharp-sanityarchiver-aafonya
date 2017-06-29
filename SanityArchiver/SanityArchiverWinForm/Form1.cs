@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using Microsoft.VisualBasic.FileIO;
 
 
 namespace SanityArchiverWinForm
@@ -98,62 +99,13 @@ namespace SanityArchiverWinForm
                 dir.Text = (directory.Name).ToString();
                 dir.Name = string.Format("dir_{0}", (directory.Name).ToString());
                 dir.Click += dir_Click;
-                dir.DoubleClick += dir_DoubleClick;
                 dir.ContextMenuStrip = new ContextMenuStrip();
+
+                CreateContextMenuStripForButtonDir(dir, directory);
 
                 dir.Dock = DockStyle.Fill;
                 this.tableLayoutPanel1.Controls.Add(dir);
             }
-        }
-
-        public void CreateFileButtons()
-        {
-            foreach (FileInfo file in files)
-            {
-                var fil = new Button();
-                fil.Text = (file.Name).ToString();
-                fil.Name = string.Format("fil_{0}", (file.Name).ToString());
-
-                CreateContextMenuStripForButton(fil, file);
-
-                fil.Click += fil_Click;
-                fil.DoubleClick += fil_DoubleClick;
-                fil.Dock = DockStyle.Fill;
-                this.tableLayoutPanel2.Controls.Add(fil);
-            }
-        }
-
-        public void CreateContextMenuStripForButton(Button button, FileInfo fileinfo)
-        {
-            button.ContextMenuStrip = new ContextMenuStrip();
-
-            ToolStripMenuItem renameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            ToolStripMenuItem attributesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            ToolStripMenuItem encryptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            ToolStripMenuItem compressToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            ToolStripMenuItem moveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            renameToolStripMenuItem.Text = "Rename";
-            attributesToolStripMenuItem.Text = "Attributes";
-            encryptToolStripMenuItem.Text = "Encrypt";
-            compressToolStripMenuItem.Text = "Compress";
-            moveToolStripMenuItem.Text = "Move";
-            renameToolStripMenuItem.Click += renameToolStripMenuItem_Click;
-            attributesToolStripMenuItem.Click += attributesToolStripMenuItem_Click;
-            encryptToolStripMenuItem.Click += encryptToolStripMenuItem_Click;
-            compressToolStripMenuItem.Click += compressToolStripMenuItem_Click;
-            moveToolStripMenuItem.Click += moveToolStripMenuItem_Click;
-
-            button.ContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[]
-                    {
-                                                        renameToolStripMenuItem,
-                                                        attributesToolStripMenuItem,
-                                                        encryptToolStripMenuItem,
-                                                        compressToolStripMenuItem,
-                                                        moveToolStripMenuItem
-                    });
-            button.ContextMenuStrip.Name = string.Format("contextMenuStrip_{0}", (fileinfo.Name).ToString());
-            button.ContextMenuStrip.Size = new System.Drawing.Size(153, 136);
-            
         }
 
         void dir_Click(object sender, EventArgs e)
@@ -161,7 +113,7 @@ namespace SanityArchiverWinForm
             var b = sender as Button;
             if (b != null)
                 MessageBox.Show(string.Format("{0} Clicked", b.Text));
-            
+
             string directoryName = (sender as Button).Text;
 
             //directoryPath = Array.Find(directories, s => s.Name.Equals(directoryName));
@@ -179,12 +131,21 @@ namespace SanityArchiverWinForm
             pictureBox1.Visible = (directories.Length > 0 && files.Length > 0) ? true : false;
         }
 
-        void dir_DoubleClick(object sender, EventArgs e)
+        public void CreateFileButtons()
         {
+            foreach (FileInfo file in files)
+            {
+                var fil = new Button();
+                fil.Text = (file.Name).ToString();
+                fil.Name = string.Format("fil_{0}", (file.FullName).ToString());
 
+                CreateContextMenuStripForButton(fil, file);
+
+                fil.Click += fil_Click;
+                fil.Dock = DockStyle.Fill;
+                this.tableLayoutPanel2.Controls.Add(fil);
+            }
         }
-
-
 
         void fil_Click(object sender, EventArgs e)
         {
@@ -195,9 +156,80 @@ namespace SanityArchiverWinForm
             b.ContextMenuStrip.Visible = true;
         }
 
-        void fil_DoubleClick(object sender, EventArgs e)
+        public void CreateContextMenuStripForButton(Button button, FileInfo fileinfo)
         {
-            var b = sender as Button;
+            button.ContextMenuStrip = new ContextMenuStrip();
+
+            ToolStripMenuItem renameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuItem attributesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuItem encryptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuItem compressToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuItem moveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            renameToolStripMenuItem.Text = "Rename";
+            attributesToolStripMenuItem.Text = "Attributes";
+            encryptToolStripMenuItem.Text = "Encrypt";
+            compressToolStripMenuItem.Text = "Compress";
+            moveToolStripMenuItem.Text = "Move";
+            renameToolStripMenuItem.Name = string.Format("tool_{0}", (fileinfo.FullName).ToString());
+            renameToolStripMenuItem.Click += renameToolStripMenuItem_Click;
+            attributesToolStripMenuItem.Name = string.Format("attr_{0}", (fileinfo.FullName).ToString());
+            attributesToolStripMenuItem.Click += attributesToolStripMenuItem_Click;
+            encryptToolStripMenuItem.Name = string.Format("encr_{0}", (fileinfo.FullName).ToString());
+            encryptToolStripMenuItem.Click += encryptToolStripMenuItem_Click;
+            compressToolStripMenuItem.Name = string.Format("comp_{0}", (fileinfo.FullName).ToString());
+            compressToolStripMenuItem.Click += compressToolStripMenuItem_Click;
+            moveToolStripMenuItem.Name = string.Format("move_{0}", (fileinfo.FullName).ToString());
+            moveToolStripMenuItem.Click += moveToolStripMenuItem_Click;
+
+            button.ContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[]
+                    {
+                                                        renameToolStripMenuItem,
+                                                        attributesToolStripMenuItem,
+                                                        encryptToolStripMenuItem,
+                                                        compressToolStripMenuItem,
+                                                        moveToolStripMenuItem
+                    });
+            button.ContextMenuStrip.Name = string.Format("contextMenuStrip_{0}", (fileinfo.Name).ToString());
+            button.ContextMenuStrip.Size = new System.Drawing.Size(153, 136);
+            
+        }
+
+        public void CreateContextMenuStripForButtonDir(Button button, DirectoryInfo directoryinfo)
+        {
+            button.ContextMenuStrip = new ContextMenuStrip();
+
+            ToolStripMenuItem renameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuItem attributesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuItem encryptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuItem compressToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuItem moveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            renameToolStripMenuItem.Text = "Rename";
+            attributesToolStripMenuItem.Text = "Attributes";
+            encryptToolStripMenuItem.Text = "Encrypt";
+            compressToolStripMenuItem.Text = "Compress";
+            moveToolStripMenuItem.Text = "Move";
+            renameToolStripMenuItem.Name = string.Format("tool_{0}", (directoryinfo.FullName).ToString());
+            renameToolStripMenuItem.Click += renameToolStripMenuItem_ClickDir;
+            attributesToolStripMenuItem.Name = string.Format("attr_{0}", (directoryinfo.FullName).ToString());
+            attributesToolStripMenuItem.Click += attributesToolStripMenuItem_ClickDir;
+            encryptToolStripMenuItem.Name = string.Format("encr_{0}", (directoryinfo.FullName).ToString());
+            encryptToolStripMenuItem.Click += encryptToolStripMenuItem_ClickDir;
+            compressToolStripMenuItem.Name = string.Format("comp_{0}", (directoryinfo.FullName).ToString());
+            compressToolStripMenuItem.Click += compressToolStripMenuItem_ClickDir;
+            moveToolStripMenuItem.Name = string.Format("move_{0}", (directoryinfo.FullName).ToString());
+            moveToolStripMenuItem.Click += moveToolStripMenuItem_ClickDir;
+
+            button.ContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[]
+                    {
+                                                        renameToolStripMenuItem,
+                                                        attributesToolStripMenuItem,
+                                                        encryptToolStripMenuItem,
+                                                        compressToolStripMenuItem,
+                                                        moveToolStripMenuItem
+                    });
+            button.ContextMenuStrip.Name = string.Format("contextMenuStrip_{0}", (directoryinfo.Name).ToString());
+            button.ContextMenuStrip.Size = new System.Drawing.Size(153, 136);
+
         }
 
         static void RecursiveSearch(List<FileInfo> foundFiles, string fileName, DirectoryInfo currentDirectory)
@@ -280,10 +312,10 @@ namespace SanityArchiverWinForm
             if (tableLayoutPanel1.Controls.Count == 0 && tableLayoutPanel2.Controls.Count == 0)
             {
                 Image myimage = new Bitmap(@"C:\Users\Judit\Pictures\cat_PNG104.png");
-                Image myimage2 = new Bitmap(@"C:\Users\Judit\Pictures\surprised_cat-300x199.png"); 
+                Image myimage3 = new Bitmap(@"C:\Users\Judit\Pictures\surprised_cat.png");
                 tableLayoutPanel1.BackgroundImage = myimage;
                 tableLayoutPanel1.BackgroundImageLayout = ImageLayout.Stretch;
-                tableLayoutPanel2.BackgroundImage = myimage2;
+                tableLayoutPanel2.BackgroundImage = myimage3;
                 tableLayoutPanel2.BackgroundImageLayout = ImageLayout.Stretch;
                 MessageBox.Show("There are no directories and files here.");
             }
@@ -291,16 +323,52 @@ namespace SanityArchiverWinForm
 
         private void renameToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //CreateMyForm();
-            ShowMyDialogBox();
+            var toolStripMenuItem = sender as ToolStripMenuItem;
+            string name = toolStripMenuItem.Name.Substring(5);
+            FileInfo fileinfo = new FileInfo(name);
+            CreateDialogForm(fileinfo);
+        }
+
+        private void renameToolStripMenuItem_ClickDir(object sender, EventArgs e)
+        {
+            var toolStripMenuItem = sender as ToolStripMenuItem;
+            string name = toolStripMenuItem.Name.Substring(5);
+            DirectoryInfo directoryinfo = new DirectoryInfo(name);
+            CreateDialogFormDir(directoryinfo);
         }
 
         private void attributesToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            var toolStripMenuItem = sender as ToolStripMenuItem;
+            string name = toolStripMenuItem.Name.Substring(5);
+            FileInfo actualFile = new FileInfo(name);
 
+            MessageBox.Show("Creation Time: " + Environment.NewLine
+                + actualFile.CreationTime.ToString() + Environment.NewLine
+                + "Last Access Time: " + Environment.NewLine
+                + actualFile.LastAccessTime + Environment.NewLine
+                + "isReadOnly: " + Environment.NewLine
+                + actualFile.IsReadOnly);
+        }
+
+        private void attributesToolStripMenuItem_ClickDir(object sender, EventArgs e)
+        {
+            var toolStripMenuItem = sender as ToolStripMenuItem;
+            string name = toolStripMenuItem.Name.Substring(5);
+            DirectoryInfo directory = new DirectoryInfo(name);
+
+            MessageBox.Show("Creation Time: " + Environment.NewLine
+                + directory.CreationTime.ToString() + Environment.NewLine
+                + "Last Acces Time: " + Environment.NewLine
+                + directory.LastAccessTime + Environment.NewLine);
         }
 
         private void encryptToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void encryptToolStripMenuItem_ClickDir(object sender, EventArgs e)
         {
 
         }
@@ -310,84 +378,180 @@ namespace SanityArchiverWinForm
 
         }
 
+        private void compressToolStripMenuItem_ClickDir(object sender, EventArgs e)
+        {
+
+        }
+
         private void moveToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
         }
 
-        public void CreateMyForm()
+        private void moveToolStripMenuItem_ClickDir(object sender, EventArgs e)
+        {
+
+        }
+
+        public void CreateDialogForm(FileInfo file)
         {
             // Create a new instance of the form.
-            Form form1 = new Form();
+            Form DialogForm = new Form();
             // Create two buttons to use as the accept and cancel buttons.
-            Button button1 = new Button();
-            Button button2 = new Button();
+            Button RenameButton = new Button();
+            Button CancelButton = new Button();
 
-            // Set the text of button1 to "OK".
-            button1.Text = "OK";
+            Label OldFileNameLabel = new Label();
+            OldFileNameLabel.Text = "Old File Name";
+            OldFileNameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            OldFileNameLabel.Location = new Point(10, 10);
+            Label OldFileNameText = new Label();
+            OldFileNameText.Text = file.Name;
+            OldFileNameText.Location = new Point(10, 40);
+            Label NewFileNameLabel = new Label();
+            NewFileNameLabel.Text = "New File Name";
+            NewFileNameLabel.Location = new Point(10, 70);
+            NewFileNameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            TextBox NewFileNameTextBox = new TextBox();
+            NewFileNameTextBox.Location = new Point(10, 100);
+
+            // Set the text of RenameButton.
+            RenameButton.Text = "Rename";
             // Set the position of the button on the form.
-            button1.Location = new Point(10, 10);
-            // Set the text of button2 to "Cancel".
-            button2.Text = "Cancel";
+            RenameButton.Location = new Point(10, 140);
+            // Set the text of CancelButton to "Cancel".
+            CancelButton.Text = "Cancel";
             // Set the position of the button based on the location of button1.
-            button2.Location
-               = new Point(button1.Left, button1.Height + button1.Top + 10);
-            // Make button1's dialog result OK.
-            button1.DialogResult = DialogResult.OK;
+            CancelButton.Location
+               = new Point(RenameButton.Left, RenameButton.Height + RenameButton.Top + 10);
+            // Make RenameButton's dialog result OK.
+            RenameButton.DialogResult = DialogResult.OK;
             // Make button2's dialog result Cancel.
-            button2.DialogResult = DialogResult.Cancel;
+            CancelButton.DialogResult = DialogResult.Cancel;
             // Set the caption bar text of the form.   
-            form1.Text = "My Dialog Box";
+            DialogForm.Text = "Rename Dialog Box";
 
             // Define the border style of the form to a dialog box.
-            form1.FormBorderStyle = FormBorderStyle.FixedDialog;
-            // Set the accept button of the form to button1.
-            form1.AcceptButton = button1;
-            // Set the cancel button of the form to button2.
-            form1.CancelButton = button2;
+            DialogForm.FormBorderStyle = FormBorderStyle.FixedDialog;
+            // Set the accept button of the form to RenameButton.
+            DialogForm.AcceptButton = RenameButton;
+            // Set the cancel button of the form to CancelButton.
+            DialogForm.CancelButton = CancelButton;
             // Set the start position of the form to the center of the screen.
-            form1.StartPosition = FormStartPosition.CenterScreen;
+            DialogForm.StartPosition = FormStartPosition.CenterScreen;
 
-            // Add button1 to the form.
-            form1.Controls.Add(button1);
-            // Add button2 to the form.
-            form1.Controls.Add(button2);
+            // Add RenameButton to the form.
+            DialogForm.Controls.Add(RenameButton);
+            // Add CancelButton to the form.
+            DialogForm.Controls.Add(CancelButton);
+            DialogForm.Controls.Add(OldFileNameLabel);
+            DialogForm.Controls.Add(OldFileNameText);
+            DialogForm.Controls.Add(NewFileNameLabel);
+            DialogForm.Controls.Add(NewFileNameTextBox);
 
             // Display the form as a modal dialog box.
-            form1.ShowDialog();
+            DialogForm.ShowDialog();
 
             // Determine if the OK button was clicked on the dialog box.
-            if (form1.DialogResult == DialogResult.OK)
+            if (DialogForm.DialogResult == DialogResult.OK)
             {
+                Microsoft.VisualBasic.FileIO.FileSystem.RenameFile(file.FullName, NewFileNameTextBox.Text);
+                UpdateDirectoryInfos();
                 // Display a message box indicating that the OK button was clicked.
                 MessageBox.Show("The OK button on the form was clicked.");
                 // Optional: Call the Dispose method when you are finished with the dialog box.
-                form1.Dispose();
+                DialogForm.Dispose();
             }
             else
             {
                 // Display a message box indicating that the Cancel button was clicked.
                 MessageBox.Show("The Cancel button on the form was clicked.");
                 // Optional: Call the Dispose method when you are finished with the dialog box.
-                form1.Dispose();
+                DialogForm.Dispose();
             }
         }
-        public void ShowMyDialogBox()
+
+        public void CreateDialogFormDir(DirectoryInfo directoryinfo)
+        {
+            // Create a new instance of the form.
+            Form DialogForm = new Form();
+            // Create two buttons to use as the accept and cancel buttons.
+            Button RenameButton = new Button();
+            Button CancelButton = new Button();
+
+            Label OldFileNameLabel = new Label();
+            OldFileNameLabel.Text = "Old Directory Name";
+            OldFileNameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            OldFileNameLabel.Location = new Point(10, 10);
+            Label OldFileNameText = new Label();
+            OldFileNameText.Text = directoryinfo.Name;
+            OldFileNameText.Location = new Point(10, 40);
+            Label NewFileNameLabel = new Label();
+            NewFileNameLabel.Text = "New Directory Name";
+            NewFileNameLabel.Location = new Point(10, 70);
+            NewFileNameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            TextBox NewFileNameTextBox = new TextBox();
+            NewFileNameTextBox.Location = new Point(10, 100);
+
+            // Set the text of RenameButton.
+            RenameButton.Text = "Rename";
+            // Set the position of the button on the form.
+            RenameButton.Location = new Point(10, 140);
+            // Set the text of CancelButton to "Cancel".
+            CancelButton.Text = "Cancel";
+            // Set the position of the button based on the location of button1.
+            CancelButton.Location
+               = new Point(RenameButton.Left, RenameButton.Height + RenameButton.Top + 10);
+            // Make RenameButton's dialog result OK.
+            RenameButton.DialogResult = DialogResult.OK;
+            // Make button2's dialog result Cancel.
+            CancelButton.DialogResult = DialogResult.Cancel;
+            // Set the caption bar text of the form.   
+            DialogForm.Text = "Rename Dialog Box";
+
+            // Define the border style of the form to a dialog box.
+            DialogForm.FormBorderStyle = FormBorderStyle.FixedDialog;
+            // Set the accept button of the form to RenameButton.
+            DialogForm.AcceptButton = RenameButton;
+            // Set the cancel button of the form to CancelButton.
+            DialogForm.CancelButton = CancelButton;
+            // Set the start position of the form to the center of the screen.
+            DialogForm.StartPosition = FormStartPosition.CenterScreen;
+
+            // Add RenameButton to the form.
+            DialogForm.Controls.Add(RenameButton);
+            // Add CancelButton to the form.
+            DialogForm.Controls.Add(CancelButton);
+            DialogForm.Controls.Add(OldFileNameLabel);
+            DialogForm.Controls.Add(OldFileNameText);
+            DialogForm.Controls.Add(NewFileNameLabel);
+            DialogForm.Controls.Add(NewFileNameTextBox);
+
+            // Display the form as a modal dialog box.
+            DialogForm.ShowDialog();
+
+            // Determine if the OK button was clicked on the dialog box.
+            if (DialogForm.DialogResult == DialogResult.OK)
+            {
+                Microsoft.VisualBasic.FileIO.FileSystem.RenameDirectory(directoryinfo.FullName, NewFileNameTextBox.Text);
+                UpdateDirectoryInfos();
+                // Display a message box indicating that the OK button was clicked.
+                MessageBox.Show("The OK button on the form was clicked.");
+                // Optional: Call the Dispose method when you are finished with the dialog box.
+                DialogForm.Dispose();
+            }
+            else
+            {
+                // Display a message box indicating that the Cancel button was clicked.
+                MessageBox.Show("The Cancel button on the form was clicked.");
+                // Optional: Call the Dispose method when you are finished with the dialog box.
+                DialogForm.Dispose();
+            }
+        }
+
+        private void button1_DragDrop(object sender, DragEventArgs e)
         {
 
-            Form2 formy = new Form2();
-            formy.Visible = true;
-            // Show testDialog as a modal dialog and determine if DialogResult = OK.
-            //if (Form2.ShowDialog(this) == DialogResult.OK)
-            //{
-            //    // Read the contents of testDialog's TextBox.
-            //    this.textbox1.Text = testDialog.TextBox1.Text;
-            //}
-            //else
-            //{
-            //    this.txtResult.Text = "Cancelled";
-            //}
-            //testDialog.Dispose();
         }
     }
 }

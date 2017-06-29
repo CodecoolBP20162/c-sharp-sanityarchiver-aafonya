@@ -33,13 +33,15 @@
             this.OldFileNameLabel = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.NewFileNameLabel = new System.Windows.Forms.Label();
+            this.RenameButton = new System.Windows.Forms.Button();
+            this.CancelButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // textBox1
             // 
             this.textBox1.Location = new System.Drawing.Point(85, 113);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(100, 20);
+            this.textBox1.Size = new System.Drawing.Size(140, 20);
             this.textBox1.TabIndex = 0;
             // 
             // OldFileNameLabel
@@ -69,11 +71,31 @@
             this.NewFileNameLabel.TabIndex = 3;
             this.NewFileNameLabel.Text = "NewFileName";
             // 
+            // RenameButton
+            // 
+            this.RenameButton.Location = new System.Drawing.Point(85, 149);
+            this.RenameButton.Name = "RenameButton";
+            this.RenameButton.Size = new System.Drawing.Size(75, 23);
+            this.RenameButton.TabIndex = 4;
+            this.RenameButton.Text = "Rename";
+            this.RenameButton.UseVisualStyleBackColor = true;
+            // 
+            // CancelButton
+            // 
+            this.CancelButton.Location = new System.Drawing.Point(197, 149);
+            this.CancelButton.Name = "CancelButton";
+            this.CancelButton.Size = new System.Drawing.Size(75, 23);
+            this.CancelButton.TabIndex = 5;
+            this.CancelButton.Text = "Cancel";
+            this.CancelButton.UseVisualStyleBackColor = true;
+            // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 261);
+            this.Controls.Add(this.CancelButton);
+            this.Controls.Add(this.RenameButton);
             this.Controls.Add(this.NewFileNameLabel);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.OldFileNameLabel);
@@ -93,5 +115,7 @@
         private System.Windows.Forms.Label OldFileNameLabel;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label NewFileNameLabel;
+        private System.Windows.Forms.Button RenameButton;
+        private System.Windows.Forms.Button CancelButton;
     }
 }
