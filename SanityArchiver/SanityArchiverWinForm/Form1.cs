@@ -16,12 +16,13 @@ namespace SanityArchiverWinForm
         DirectoryInfo[] directories;
         FileInfo[] files;
 
-        
+        List<DirectoryInfo> directoriesToCopy = new List<DirectoryInfo>();
+        List <FileInfo> filesToCopy = new List<FileInfo>();
 
         public Form1()
         {
             InitializeComponent();
-
+           
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -49,6 +50,11 @@ namespace SanityArchiverWinForm
 
         public void CreateTable(int DirectoryNumber, DirectoryInfo[] directories, int FileNumber, FileInfo[] files)
         {
+            tableLayoutPanel1.AutoScroll = (DirectoryNumber > 21) ? true : false;
+            tableLayoutPanel2.AutoScroll = (FileNumber > 21) ? true : false;
+            tableLayoutPanel1.AutoSize = (DirectoryNumber > 21) ? false : true;
+            tableLayoutPanel2.AutoSize = (FileNumber > 21) ? false : true;
+
             int rowCount;
             int rowCountForFiles;
             int columnCount = 3;
@@ -70,6 +76,12 @@ namespace SanityArchiverWinForm
 
             this.tableLayoutPanel1.ColumnStyles.Clear();
             this.tableLayoutPanel1.RowStyles.Clear();
+
+            this.tableLayoutPanel2.ColumnCount = columnCount;
+            this.tableLayoutPanel2.RowCount = rowCountForFiles;
+
+            this.tableLayoutPanel2.ColumnStyles.Clear();
+            this.tableLayoutPanel2.RowStyles.Clear();
 
             for (int i = 0; i < columnCount; i++)
             {
@@ -111,8 +123,8 @@ namespace SanityArchiverWinForm
         void dir_Click(object sender, EventArgs e)
         {
             var b = sender as Button;
-            if (b != null)
-                MessageBox.Show(string.Format("{0} Clicked", b.Text));
+            //if (b != null)
+            //    MessageBox.Show(string.Format("{0} Clicked", b.Text));
 
             string directoryName = (sender as Button).Text;
 
@@ -150,8 +162,8 @@ namespace SanityArchiverWinForm
         void fil_Click(object sender, EventArgs e)
         {
             var b = sender as Button;
-            if (b != null)
-                MessageBox.Show(string.Format("{0} Clicked", b.Text));
+            //if (b != null)
+            //    MessageBox.Show(string.Format("{0} Clicked", b.Text));
 
             b.ContextMenuStrip.Visible = true;
         }
@@ -164,12 +176,14 @@ namespace SanityArchiverWinForm
             ToolStripMenuItem attributesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuItem encryptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuItem compressToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            ToolStripMenuItem moveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuItem copyToolStripMenuItem = new ToolStripMenuItem();
+            ToolStripMenuItem pasteToolStripMenuItem = new ToolStripMenuItem();
             renameToolStripMenuItem.Text = "Rename";
             attributesToolStripMenuItem.Text = "Attributes";
             encryptToolStripMenuItem.Text = "Encrypt";
             compressToolStripMenuItem.Text = "Compress";
-            moveToolStripMenuItem.Text = "Move";
+            copyToolStripMenuItem.Text = "Copy";
+            pasteToolStripMenuItem.Text = "Paste";
             renameToolStripMenuItem.Name = string.Format("tool_{0}", (fileinfo.FullName).ToString());
             renameToolStripMenuItem.Click += renameToolStripMenuItem_Click;
             attributesToolStripMenuItem.Name = string.Format("attr_{0}", (fileinfo.FullName).ToString());
@@ -178,8 +192,8 @@ namespace SanityArchiverWinForm
             encryptToolStripMenuItem.Click += encryptToolStripMenuItem_Click;
             compressToolStripMenuItem.Name = string.Format("comp_{0}", (fileinfo.FullName).ToString());
             compressToolStripMenuItem.Click += compressToolStripMenuItem_Click;
-            moveToolStripMenuItem.Name = string.Format("move_{0}", (fileinfo.FullName).ToString());
-            moveToolStripMenuItem.Click += moveToolStripMenuItem_Click;
+            copyToolStripMenuItem.Name = string.Format("copy_{0}", (fileinfo.FullName).ToString());
+            copyToolStripMenuItem.Click += copyToolStripMenuItem_Click;
 
             button.ContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[]
                     {
@@ -187,7 +201,8 @@ namespace SanityArchiverWinForm
                                                         attributesToolStripMenuItem,
                                                         encryptToolStripMenuItem,
                                                         compressToolStripMenuItem,
-                                                        moveToolStripMenuItem
+                                                        copyToolStripMenuItem,
+                                                        pasteToolStripMenuItem
                     });
             button.ContextMenuStrip.Name = string.Format("contextMenuStrip_{0}", (fileinfo.Name).ToString());
             button.ContextMenuStrip.Size = new System.Drawing.Size(153, 136);
@@ -202,12 +217,14 @@ namespace SanityArchiverWinForm
             ToolStripMenuItem attributesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuItem encryptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuItem compressToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            ToolStripMenuItem moveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuItem copyToolStripMenuItem = new ToolStripMenuItem();
+            ToolStripMenuItem pasteToolStripMenuItem = new ToolStripMenuItem();
             renameToolStripMenuItem.Text = "Rename";
             attributesToolStripMenuItem.Text = "Attributes";
             encryptToolStripMenuItem.Text = "Encrypt";
             compressToolStripMenuItem.Text = "Compress";
-            moveToolStripMenuItem.Text = "Move";
+            copyToolStripMenuItem.Text = "Copy";
+            pasteToolStripMenuItem.Text = "Paste";
             renameToolStripMenuItem.Name = string.Format("tool_{0}", (directoryinfo.FullName).ToString());
             renameToolStripMenuItem.Click += renameToolStripMenuItem_ClickDir;
             attributesToolStripMenuItem.Name = string.Format("attr_{0}", (directoryinfo.FullName).ToString());
@@ -216,8 +233,10 @@ namespace SanityArchiverWinForm
             encryptToolStripMenuItem.Click += encryptToolStripMenuItem_ClickDir;
             compressToolStripMenuItem.Name = string.Format("comp_{0}", (directoryinfo.FullName).ToString());
             compressToolStripMenuItem.Click += compressToolStripMenuItem_ClickDir;
-            moveToolStripMenuItem.Name = string.Format("move_{0}", (directoryinfo.FullName).ToString());
-            moveToolStripMenuItem.Click += moveToolStripMenuItem_ClickDir;
+            copyToolStripMenuItem.Name = string.Format("copy_{0}", (directoryinfo.FullName).ToString());
+            copyToolStripMenuItem.Click += copyToolStripMenuItem_ClickDir;
+            pasteToolStripMenuItem.Name = string.Format("past_{0}", (directoryinfo.FullName).ToString());
+            pasteToolStripMenuItem.Click += pasteToolStripMenuItem_ClickDir;
 
             button.ContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[]
                     {
@@ -225,24 +244,12 @@ namespace SanityArchiverWinForm
                                                         attributesToolStripMenuItem,
                                                         encryptToolStripMenuItem,
                                                         compressToolStripMenuItem,
-                                                        moveToolStripMenuItem
+                                                        copyToolStripMenuItem,
+                                                        pasteToolStripMenuItem
                     });
             button.ContextMenuStrip.Name = string.Format("contextMenuStrip_{0}", (directoryinfo.Name).ToString());
             button.ContextMenuStrip.Size = new System.Drawing.Size(153, 136);
 
-        }
-
-        static void RecursiveSearch(List<FileInfo> foundFiles, string fileName, DirectoryInfo currentDirectory)
-        {
-            foreach (FileInfo fil in currentDirectory.GetFiles())
-            {
-                if (fil.Name == fileName)
-                    foundFiles.Add(fil);
-            }
-            foreach (DirectoryInfo dir in currentDirectory.GetDirectories())
-            {
-                RecursiveSearch(foundFiles, fileName, dir);
-            }
         }
 
         private void UpdateButton_Click(object sender, EventArgs e)
@@ -300,11 +307,6 @@ namespace SanityArchiverWinForm
 
             directoryPath = directory.FullName;
             ActualDirectoriesName.Text = directoryPath;
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-
         }
 
         public void CheckZeroDirectoriesAndFiles()
@@ -383,14 +385,68 @@ namespace SanityArchiverWinForm
 
         }
 
-        private void moveToolStripMenuItem_Click(object sender, EventArgs e)
+        private void copyToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            var toolStripMenuItem = sender as ToolStripMenuItem;
+            string name = toolStripMenuItem.Name.Substring(5);
+            FileInfo actualFile = new FileInfo(name);
+            filesToCopy.Add(actualFile);
 
+            if(directoriesToCopy.Count > 0)
+            {
+                directoriesToCopy.Clear();
+            }
         }
 
-        private void moveToolStripMenuItem_ClickDir(object sender, EventArgs e)
+        private void copyToolStripMenuItem_ClickDir(object sender, EventArgs e)
         {
+            var toolStripMenuItem = sender as ToolStripMenuItem;
+            string name = toolStripMenuItem.Name.Substring(5);
+            DirectoryInfo directoryinfo = new DirectoryInfo(name);
+            directoriesToCopy.Add(directoryinfo);
 
+            if(filesToCopy.Count > 0)
+            {
+                filesToCopy.Clear();
+            }
+        }
+        //trololo
+        private void pasteToolStripMenuItem_ClickDir(object sender, EventArgs e)
+        {
+            var toolStripMenuItem = sender as ToolStripMenuItem;
+            string name = toolStripMenuItem.Name.Substring(5);
+            DirectoryInfo directoryinfo = new DirectoryInfo(name);
+
+            if(filesToCopy.Count > 0)
+            {
+                foreach(FileInfo filinfo in filesToCopy)
+                {
+                    string destinationFileName = directoryinfo.FullName + @"\" + filinfo.Name;
+
+                    DirectoryInfo ndirinfo = new DirectoryInfo(destinationFileName);
+                    if (ndirinfo.Exists)
+                    {
+                        destinationFileName = destinationFileName + "_Copied";
+                    }
+                    else { FileSystem.CopyFile(filinfo.FullName, destinationFileName); }     
+                }
+            } else if(directoriesToCopy.Count > 0)
+            {
+                foreach (DirectoryInfo dirinfo in directoriesToCopy)
+                {
+                    string destinationFileName = directoryinfo.FullName + @"\" + dirinfo.Name;
+
+                    DirectoryInfo ndirinfo = new DirectoryInfo(destinationFileName);
+                    if (ndirinfo.Exists)
+                    {
+                        destinationFileName = destinationFileName + "_Copied";
+                    }
+                    else { FileSystem.CopyDirectory(dirinfo.FullName, destinationFileName); }
+                }
+            } else
+            {
+                MessageBox.Show("No Directory or File on your Clipboard.");
+            }
         }
 
         public void CreateDialogForm(FileInfo file)
@@ -547,11 +603,6 @@ namespace SanityArchiverWinForm
                 // Optional: Call the Dispose method when you are finished with the dialog box.
                 DialogForm.Dispose();
             }
-        }
-
-        private void button1_DragDrop(object sender, DragEventArgs e)
-        {
-
         }
     }
 }
