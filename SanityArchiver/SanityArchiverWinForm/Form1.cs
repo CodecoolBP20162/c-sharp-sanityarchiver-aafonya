@@ -423,10 +423,13 @@ namespace SanityArchiverWinForm
                 {
                     string destinationFileName = directoryinfo.FullName + @"\" + filinfo.Name;
 
-                    DirectoryInfo ndirinfo = new DirectoryInfo(destinationFileName);
-                    if (ndirinfo.Exists)
+                    FileInfo nfinfo = new FileInfo(destinationFileName);
+                    if (nfinfo.Exists)
                     {
-                        destinationFileName = destinationFileName + "_Copied";
+                        Random rnd = new Random();
+                        int code = rnd.Next(1, 1000);
+                        destinationFileName = destinationFileName + "_Copied" + code.ToString();
+                        FileSystem.CopyFile(filinfo.FullName, destinationFileName);
                     }
                     else { FileSystem.CopyFile(filinfo.FullName, destinationFileName); }     
                 }
@@ -439,7 +442,10 @@ namespace SanityArchiverWinForm
                     DirectoryInfo ndirinfo = new DirectoryInfo(destinationFileName);
                     if (ndirinfo.Exists)
                     {
-                        destinationFileName = destinationFileName + "_Copied";
+                        Random rnd = new Random();
+                        int code = rnd.Next(1, 1000);
+                        destinationFileName = destinationFileName + "_Copied" + code.ToString();
+                        FileSystem.CopyDirectory(dirinfo.FullName, destinationFileName);
                     }
                     else { FileSystem.CopyDirectory(dirinfo.FullName, destinationFileName); }
                 }
