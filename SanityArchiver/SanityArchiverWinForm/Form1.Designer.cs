@@ -77,7 +77,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(349, 255);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(349, 252);
             this.tableLayoutPanel1.TabIndex = 2;
             // 
             // tableLayoutPanel2

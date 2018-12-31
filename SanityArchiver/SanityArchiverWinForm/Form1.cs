@@ -50,10 +50,10 @@ namespace SanityArchiverWinForm
 
         public void CreateTable(int DirectoryNumber, DirectoryInfo[] directories, int FileNumber, FileInfo[] files)
         {
-            tableLayoutPanel1.AutoScroll = (DirectoryNumber > 21) ? true : false;
-            tableLayoutPanel2.AutoScroll = (FileNumber > 21) ? true : false;
-            tableLayoutPanel1.AutoSize = (DirectoryNumber > 21) ? false : true;
-            tableLayoutPanel2.AutoSize = (FileNumber > 21) ? false : true;
+            tableLayoutPanel1.AutoScroll = (DirectoryNumber > 9) ? true : false;
+            tableLayoutPanel2.AutoScroll = (FileNumber > 9) ? true : false;
+            tableLayoutPanel1.AutoSize = (DirectoryNumber > 9) ? false : true;
+            tableLayoutPanel2.AutoSize = (FileNumber > 9) ? false : true;
 
             int rowCount;
             int rowCountForFiles;
